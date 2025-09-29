@@ -1,8 +1,6 @@
 # bookstore-microservices
 bookstore-microservices
 
-./start_services.sh
-
 # Dockerized setup
 
 ## Build and run
