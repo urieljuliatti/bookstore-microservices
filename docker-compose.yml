@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: bookstore_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  books-service:
+    build:
+      context: ./books-service
+    container_name: books_service
+    depends_on:
+      - db
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgres://postgres:postgres@db:5432/books_service_production
+      SECRET_KEY_BASE: postgres
+      RAILS_LOG_TO_STDOUT: "1"
+    ports:
+      - "4000:80"
+
+  storefront:
+    build:
+      context: ./storefront
+    container_name: storefront
+    depends_on:
+      - db
+      - books-service
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgres://postgres:postgres@db:5432/storefront_production
+      SECRET_KEY_BASE: postgres
+      RAILS_LOG_TO_STDOUT: "1"
+      BOOKS_API_URL: http://books-service/api/v1
+    ports:
+      - "4001:80"
+
+volumes:
+  pgdata: {}
+
+
